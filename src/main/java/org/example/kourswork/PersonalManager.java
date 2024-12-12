@@ -1,147 +1,215 @@
 package org.example.kourswork;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.text.Font;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PersonalManager extends Application {
 
+    private VBox mainPanel;
+    private List<User> users = new ArrayList<>();
+
     @Override
     public void start(Stage primaryStage) {
-        // Размеры экрана
-        double screenWidth = 1920;
-        double screenHeight = 1080;
-
         // Основной макет
         BorderPane root = new BorderPane();
 
-        // Панель навигации (слева)
+        // Панель навигации
         VBox navPanel = createNavPanel();
+        mainPanel = new VBox();
+        mainPanel.setStyle("-fx-padding: 20;");
 
-        // Основная рабочая панель (центральная)
-        StackPane mainPanel = new StackPane();
-        mainPanel.setStyle("-fx-background-color: #f0f0f0;");
+        // Панель регистрации
+        createRegistrationPanel();
 
-        // Изменение контента в зависимости от выбора
-        navPanel.setOnMouseClicked(event -> mainPanel.getChildren().setAll(createTaskWidget())); // Начнем с задач
-
-        // Устанавливаем панели
+        // Установка панелей
         root.setLeft(navPanel);
         root.setCenter(mainPanel);
 
         // Настройка сцены
-        Scene scene = new Scene(root, screenWidth, screenHeight);
-        primaryStage.setTitle("Personal Manager Application");
+        Scene scene = new Scene(root, 1200, 800);
+        primaryStage.setTitle("Personal Manager");
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 
     private VBox createNavPanel() {
         VBox navPanel = new VBox(15);
-        navPanel.setStyle("-fx-background-color: #2c3e50; -fx-padding: 20; -fx-alignment: center;");
+        navPanel.setStyle("-fx-background-color: #2c3e50; -fx-padding: 20;");
 
-        // Кнопки навигации
-        Button taskButton = new Button("Задачи");
-        Button calendarButton = new Button("Календарь");
-        Button contactsButton = new Button("Контакты");
-        Button financeButton = new Button("Финансы");
+        Button registrationButton = createNavButton("Регистрация");
+        registrationButton.setOnAction(e -> createRegistrationPanel());
 
-        styleButton(taskButton);
-        styleButton(calendarButton);
-        styleButton(contactsButton);
-        styleButton(financeButton);
-
-        navPanel.getChildren().addAll(taskButton, calendarButton, contactsButton, financeButton);
-
-        // Обработчики для кнопок навигации
-        taskButton.setOnAction(e -> setMainPanel(createTaskWidget()));
-        calendarButton.setOnAction(e -> setMainPanel(createCalendarWidget()));
-        contactsButton.setOnAction(e -> setMainPanel(createContactsWidget()));
-        financeButton.setOnAction(e -> setMainPanel(createFinanceWidget()));
-
+        navPanel.getChildren().addAll(registrationButton);
         return navPanel;
     }
 
-    private void styleButton(Button button) {
-        button.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-background-color: transparent; -fx-border-color: white;");
+    private Button createNavButton(String text) {
+        Button button = new Button(text);
+        button.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: transparent; -fx-border-color: white;");
         button.setMaxSize(200, 40);
         button.setMinSize(200, 40);
+        return button;
     }
 
-    private void setMainPanel(Pane panel) {
-        StackPane mainPanel = new StackPane();
-        mainPanel.getChildren().setAll(panel);
+    private void createHomePage() {
+        mainPanel.getChildren().clear();
+
+        Label lblHome = new Label("Добро пожаловать в Personal Manager!");
+        lblHome.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Button profileButton = new Button("Профиль");
+        profileButton.setOnAction(e -> createProfilePage());
+
+        Button tasksButton = new Button("Задачи");
+        tasksButton.setOnAction(e -> createTasksPage());
+
+        Button settingsButton = new Button("Настройки");
+        settingsButton.setOnAction(e -> createSettingsPage());
+
+        Button logoutButton = new Button("Выйти");
+        logoutButton.setOnAction(e -> createRegistrationPanel());
+
+        VBox homePanel = new VBox(10, lblHome, profileButton, tasksButton, settingsButton, logoutButton);
+        homePanel.setPadding(new Insets(20));
+        homePanel.setStyle("-fx-background-color: #ecf0f1;");
+
+        mainPanel.getChildren().add(homePanel);
     }
 
-    // Виджет задач
-    private VBox createTaskWidget() {
-        VBox taskWidget = new VBox(10);
-        taskWidget.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
+    private void createProfilePage() {
+        mainPanel.getChildren().clear();
 
-        // Задачи: добавление, редактирование, удаление
-        TextField newTaskField = new TextField();
-        newTaskField.setPromptText("Введите описание задачи");
+        Label lblProfile = new Label("Страница профиля");
+        lblProfile.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        Button addTaskButton = new Button("Добавить задачу");
-        addTaskButton.setStyle("-fx-background-color: lightgreen;");
+        Button backButton = new Button("Назад");
+        backButton.setOnAction(e -> createHomePage());
 
-        ListView<String> taskListView = new ListView<>();
-        taskListView.setPrefHeight(300);
+        VBox profilePanel = new VBox(10, lblProfile, backButton);
+        profilePanel.setPadding(new Insets(20));
+        profilePanel.setStyle("-fx-background-color: #ecf0f1;");
 
-        // Добавление задачи
-        addTaskButton.setOnAction(e -> {
-            String task = newTaskField.getText();
-            if (!task.isEmpty()) {
-                taskListView.getItems().add(task);
-                newTaskField.clear(); // Очистка поля
+        mainPanel.getChildren().add(profilePanel);
+    }
+
+    private void createTasksPage() {
+        mainPanel.getChildren().clear();
+
+        Label lblTasks = new Label("Страница задач");
+        lblTasks.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Button backButton = new Button("Назад");
+        backButton.setOnAction(e -> createHomePage());
+
+        VBox tasksPanel = new VBox(10, lblTasks, backButton);
+        tasksPanel.setPadding(new Insets(20));
+        tasksPanel.setStyle("-fx-background-color: #ecf0f1;");
+
+        mainPanel.getChildren().add(tasksPanel);
+    }
+
+    private void createSettingsPage() {
+        mainPanel.getChildren().clear();
+
+        Label lblSettings = new Label("Страница настроек");
+        lblSettings.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Button backButton = new Button("Назад");
+        backButton.setOnAction(e -> createHomePage());
+
+        VBox settingsPanel = new VBox(10, lblSettings, backButton);
+        settingsPanel.setPadding(new Insets(20));
+        settingsPanel.setStyle("-fx-background-color: #ecf0f1;");
+
+        mainPanel.getChildren().add(settingsPanel);
+    }
+
+    private void createRegistrationPanel() {
+        mainPanel.getChildren().clear();
+
+        Label lblRegister = new Label("Регистрация пользователя:");
+        TextField txtName = new TextField();
+        txtName.setPromptText("Имя");
+
+        TextField txtEmail = new TextField();
+        txtEmail.setPromptText("Email");
+
+        PasswordField txtPassword = new PasswordField();
+        txtPassword.setPromptText("Пароль");
+
+        PasswordField txtConfirmPassword = new PasswordField();
+        txtConfirmPassword.setPromptText("Подтвердите пароль");
+
+        Button btnRegister = new Button("Зарегистрироваться");
+        btnRegister.setOnAction(e -> {
+            String name = txtName.getText();
+            String email = txtEmail.getText();
+            String password = txtPassword.getText();
+            String confirmPassword = txtConfirmPassword.getText();
+
+            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Ошибка", "Все поля должны быть заполнены.");
+                return;
             }
+
+            if (!password.equals(confirmPassword)) {
+                showAlert(Alert.AlertType.ERROR, "Ошибка", "Пароли не совпадают.");
+                return;
+            }
+
+            users.add(new User(name, email, password));
+            showAlert(Alert.AlertType.INFORMATION, "Успех", "Регистрация прошла успешно.");
+            createHomePage(); // Переход на главную страницу
         });
 
-        taskWidget.getChildren().addAll(newTaskField, addTaskButton, taskListView);
-        return taskWidget;
+        VBox registrationPanel = new VBox(10, lblRegister, txtName, txtEmail, txtPassword, txtConfirmPassword, btnRegister);
+        registrationPanel.setPadding(new Insets(20));
+        registrationPanel.setStyle("-fx-background-color: #ecf0f1;");
+
+        mainPanel.getChildren().add(registrationPanel);
     }
 
-    // Виджет календаря
-    private VBox createCalendarWidget() {
-        VBox calendarWidget = new VBox(10);
-        calendarWidget.setStyle("-fx-background-color: lightblue; -fx-padding: 10;");
-
-        Label label = new Label("Календарь");
-        label.setStyle("-fx-font-size: 24px;");
-
-        calendarWidget.getChildren().addAll(label);
-        return calendarWidget;
-    }
-
-    // Виджет контактов
-    private VBox createContactsWidget() {
-        VBox contactsWidget = new VBox(10);
-        contactsWidget.setStyle("-fx-background-color: lightyellow; -fx-padding: 10;");
-
-        Label label = new Label("Контакты");
-        label.setStyle("-fx-font-size: 24px;");
-
-        contactsWidget.getChildren().addAll(label);
-        return contactsWidget;
-    }
-
-    // Виджет финансов
-    private VBox createFinanceWidget() {
-        VBox financeWidget = new VBox(10);
-        financeWidget.setStyle("-fx-background-color: lightcoral; -fx-padding: 10;");
-
-        Label label = new Label("Финансовый планировщик");
-        label.setStyle("-fx-font-size: 24px;");
-
-        financeWidget.getChildren().addAll(label);
-        return financeWidget;
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+}
+
+class User {
+    private String name;
+    private String email;
+    private String password;
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
